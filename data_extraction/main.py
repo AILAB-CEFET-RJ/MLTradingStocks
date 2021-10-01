@@ -1,3 +1,5 @@
+import urllib
+
 from selenium import webdriver
 import concurrent.futures
 import pandas as pd
@@ -9,6 +11,7 @@ import os
 import glob
 import gc
 from pytz import timezone
+from urllib import request
 
 tz = timezone('US/Eastern')
 pd.set_option('display.max_columns', 500)
@@ -61,7 +64,7 @@ def Load():
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('window-size=1920x1080')
-    path = os.getcwd() + "/chromedriver"
+    path = os.getcwd() + "\chromedriver"
     # print(f'path: {path}')
 
     driver = webdriver.Chrome(options=chrome_options)
@@ -88,34 +91,51 @@ def scrapper(URLs):
 
 def getHTML(URL):
     driver = Load()
-    # print(f'This is the URL: {URL}')
+    driver.implicitly_wait(5)
+    print('Antes de pegar a página')
     driver.get(URL)
-    time.sleep(1)
-    # driver.maximize_window()
-    content = BeautifulSoup(driver.page_source, "lxml")
+    elemento = driver.find_element_by_id("bkTimestamp0")
+    print(elemento)
+
+    page = driver.execute_script('return document.body.innerHTML')
+    time.sleep(2)
+    print('Pegou a página')
+
+    # content = BeautifulSoup(driver.page_source, "lxml")
+    content = BeautifulSoup(''.join(page), 'html.parser')
+    # page = request.urlopen(URL)
+    # content = BeautifulSoup(page)
+    # print(f'content: {content}')
     time.sleep(1)
     # print('teste')
 
     last_updated_time = content.find('span', id="bkTimestamp0")
+    # last_updated_time = soup.find(id="bkTimestamp0")
     print(f'URL: {URL}\nLast Updated Time: {last_updated_time.contents}')
 
     if not last_updated_time.text.strip():  # Check if last time is not null or empty
         print(f"Last updated time wasn't caught for {URL}")
-
         tries = 0
         while not last_updated_time.text.strip() and tries < 11:
             tries += 1
+
+            papel = URL.split("/")[-1]
+            filename_error = os.getcwd() + '/erros_html/' + papel + "_" + datetime.now().strftime(
+                '%Y-%m-%d_%H-%M-%S') + ".txt"
+            f = open(filename_error, 'w', encoding="utf8")
+            f.write(content.text)
+            f.close()
+
             driver.get(URL)
-            time.sleep(5)
-            # driver.maximize_window()
+            time.sleep(2)
             content = BeautifulSoup(driver.page_source, "lxml")
-            time.sleep(3)
-            last_updated_time = content.find('span', id='bkTimestamp0')
+            last_updated_time = content.find('span', id="bkTimestamp0")
+            time.sleep(2)
 
         if last_updated_time.text.strip():
             print('Last updated time was caught!')
         else:
-            print(f'All tried for {URL} have failed.')
+            print(f'All tries for {URL} have failed.')
 
     driver.quit()
     papel = URL.split("/")[-1]
@@ -234,7 +254,8 @@ def html2csv(papel):
                  'Last 10 Trades Share': last_10_shares_formatted, 'Type': last_booktype,
                  'Captured Datetimes': captured_datetime})
 
-            csvfilename = os.getcwd() + "/data/" + papel + "_trades_" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".csv"
+            csvfilename = os.getcwd() + "/data/" + papel + "_trades_" + datetime.now().strftime(
+                '%Y-%m-%d_%H-%M-%S') + ".csv"
             print(f'csvfilename: {csvfilename}')
 
             if os.path.exists(csvfilename):
@@ -249,10 +270,9 @@ def html2csv(papel):
             print("não salvou")
 
 
-
-
 lower_limit = datetime.strptime('09:30:00', '%H:%M:%S').strftime('%H:%M:%S')
 upper_limit = datetime.strptime('22:20:20', '%H:%M:%S').strftime('%H:%M:%S')
+
 
 def main():
     print('comecou a execucao')
