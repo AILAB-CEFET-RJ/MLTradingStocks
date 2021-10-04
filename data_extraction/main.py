@@ -279,7 +279,7 @@ def erase_htmls():
 
 
 def main():
-    print('início da execução do programa')
+    print('Início da execução do programa')
 
 
     # Sempre executa
@@ -323,5 +323,5 @@ def main():
 
 if (__name__ == '__main__'):
     lower_limit = datetime.strptime('09:00:00', '%H:%M:%S').strftime('%H:%M:%S')
-    upper_limit = datetime.strptime('22:20:20', '%H:%M:%S').strftime('%H:%M:%S')
+    upper_limit = datetime.strptime('16:30:00', '%H:%M:%S').strftime('%H:%M:%S')
     main()
