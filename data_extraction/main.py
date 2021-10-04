@@ -147,7 +147,7 @@ def getHTML(URL):
     f = open(filename, 'w', encoding="utf8")
     print("Gerou arquivo html", papel)
     f.write(str(content))
-    print("escreveu arquivo html com sucesso", papel)
+    print("escreveu arquivo html com sucesso -", papel)
     f.close()
     # pass
     return
@@ -284,7 +284,8 @@ def main():
 
     # Sempre executa
     while True:
-        done = (datetime.now(tz).strftime('%H:%M:%S') > upper_limit or datetime.now(tz).strftime('%H:%M:%S') < lower_limit)
+        done = (datetime.now(tz).strftime('%H:%M:%S') > upper_limit or datetime.now(tz).strftime('%H:%M:%S') < lower_limit or
+                datetime.today().weekday() == 5 or datetime.today().weekday() == 6)
 
         while done:
             print('Done')
@@ -293,7 +294,7 @@ def main():
             sleep(60*30)
 
             done = (datetime.now(tz).strftime('%H:%M:%S') > upper_limit or datetime.now(tz).strftime(
-                '%H:%M:%S') < lower_limit)
+                '%H:%M:%S') < lower_limit or datetime.today().weekday() == 5 or datetime.today().weekday() == 6)
 
 
         while not done:
@@ -322,6 +323,6 @@ def main():
 
 
 if (__name__ == '__main__'):
-    lower_limit = datetime.strptime('09:00:00', '%H:%M:%S').strftime('%H:%M:%S')
+    lower_limit = datetime.strptime('08:00:00', '%H:%M:%S').strftime('%H:%M:%S')
     upper_limit = datetime.strptime('16:30:00', '%H:%M:%S').strftime('%H:%M:%S')
     main()
