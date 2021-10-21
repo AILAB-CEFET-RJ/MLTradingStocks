@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import concurrent.futures
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -16,6 +17,7 @@ import glob
 import gc
 from pytz import timezone
 from urllib import request
+
 
 URL = ['https://www.cboe.com/us/equities/market_statistics/book/MSFT/',
        'https://markets.cboe.com/us/equities/market_statistics/book/MSFT',
@@ -39,12 +41,16 @@ URL = ['https://www.cboe.com/us/equities/market_statistics/book/MSFT/',
        'https://markets.cboe.com/us/equities/market_statistics/book/DAL',
        'https://markets.cboe.com/us/equities/market_statistics/book/NEM']
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('window-size=1920x1080')
-chrome_options.add_argument("--ignore-certificate-errors")
+
+options = FirefoxOptions()
+options.add_argument("--headless")
+
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument('--no-sandbox')
+# chrome_options.add_argument('--headless')
+# chrome_options.add_argument('--disable-gpu')
+# chrome_options.add_argument('window-size=1920x1080')
+# chrome_options.add_argument("--ignore-certificate-errors")
 
 # path = os.getcwd() + "/chromedriver"
 
@@ -53,7 +59,8 @@ for url in URL:
     print(url)
     stock = text_url.replace("https://markets.cboe.com/us/equities/market_statistics/book/", "")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Firefox(options=options)
+    # driver = webdriver.Chrome(options=chrome_options)
     driver.implicitly_wait(30)
     print('Antes de pegar a página')
     driver.get(url)

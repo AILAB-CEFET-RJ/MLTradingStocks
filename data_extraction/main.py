@@ -1,9 +1,12 @@
 import urllib
 
+# import chromedriver_binary
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import concurrent.futures
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -63,13 +66,10 @@ MAX_THREADS = 10
 
 
 def Load():
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('window-size=1920x1080')
+    options = FirefoxOptions()
+    options.add_argument("--headless")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Firefox(options=options)
     return driver
 
 
@@ -324,5 +324,5 @@ def main():
 
 if (__name__ == '__main__'):
     lower_limit = datetime.strptime('08:00:00', '%H:%M:%S').strftime('%H:%M:%S')
-    upper_limit = datetime.strptime('16:30:00', '%H:%M:%S').strftime('%H:%M:%S')
+    upper_limit = datetime.strptime('20:00:00', '%H:%M:%S').strftime('%H:%M:%S')
     main()
