@@ -4,6 +4,7 @@ import urllib
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox import options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
@@ -66,10 +67,14 @@ MAX_THREADS = 10
 
 
 def Load():
-    options = FirefoxOptions()
+    # options = FirefoxOptions()
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-gpu")
     options.add_argument("--headless")
 
-    driver = webdriver.Firefox(options=options)
+    # driver = webdriver.Firefox(options=options)
+    driver = webdriver.Chrome(options=options)
+    print('working')
     return driver
 
 
@@ -303,26 +308,28 @@ def main():
 
             minute = datetime.now(tz).minute
 
-            # De 2 em 2 minutos (para minutos pares) realiza as coletas e salva os HTML:
-            if minute % 2 == 0:
-                print(f"loop de coleta iniciado, em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
-                scrapper(URLs)
-                print(datetime.now(tz).strftime('%H:%M:%S'), 'fim deste loop. gc:', gc.get_count())
-
-                # Garbage collector
-                gc.collect()
-                print(f"Coleta realizada em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
-                print(f"Garbage Collector (gc): {gc.get_count()}")
-
             if done:
                 for ticker in symbols:
                     html2csv(ticker)
                 print(f'Arquivos CSV gerados para {ticker}')
+            else:
+            
+                # De 2 em 2 minutos (para minutos pares) realiza as coletas e salva os HTML:
+                if minute % 2 == 0:
+                    print(f"loop de coleta iniciado, em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
+                    scrapper(URLs)
+                    print(datetime.now(tz).strftime('%H:%M:%S'), 'fim deste loop. gc:', gc.get_count())
+
+                    # Garbage collector
+                    gc.collect()
+                    print(f"Coleta realizada em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
+                    print(f"Garbage Collector (gc): {gc.get_count()}")
+
 
 
 
 
 if (__name__ == '__main__'):
     lower_limit = datetime.strptime('08:00:00', '%H:%M:%S').strftime('%H:%M:%S')
-    upper_limit = datetime.strptime('20:00:00', '%H:%M:%S').strftime('%H:%M:%S')
+    upper_limit = datetime.strptime('18:00:00', '%H:%M:%S').strftime('%H:%M:%S')
     main()
