@@ -11,10 +11,12 @@ import concurrent.futures
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
+from datetime import date
 import time
 from time import sleep
 import codecs
 import os
+from os import path
 import glob
 import gc
 from pytz import timezone
@@ -51,12 +53,12 @@ MAX_THREADS = 10
 
 
 def Load():
-    # options = FirefoxOptions()
-    options = webdriver.ChromeOptions()
+    options = FirefoxOptions()
+    # options = webdriver.ChromeOptions()
     options.add_argument("--headless")
 
-    # driver = webdriver.Firefox(options=options)
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Firefox(options=options)
+    # driver = webdriver.Chrome(options=options)
     return driver
 
 
@@ -98,14 +100,6 @@ def getHTML(URL):
 
     print('Pegou a página')
 
-    # content = BeautifulSoup(driver.page_source, "lxml")
-    # content = BeautifulSoup(''.join(page), 'html.parser')
-    # page = request.urlopen(URL)
-    # content = BeautifulSoup(page)
-    # print(f'content: {content}')
-    # time.sleep(1)
-    # print('teste')
-
 
     last_updated_time = content.find('span', id="bkTimestamp0")
     print(f'URL: {URL}\nLast Updated Time: {last_updated_time.contents}')
@@ -131,27 +125,20 @@ def getHTML(URL):
     Finish(driver)
     papel = URL.split("/")[-1]
 
-    # Salva HTML na pasta html
-    filename = os.getcwd() + '/html/' + papel + "_" + content_date + ".html"
+    today_date = date.today().strftime('%d-%m-%Y')
 
-    f = open(filename, 'w', encoding="utf8")
-    f.write(str(content))    
-    f.close()
+    # Salva HTML na pasta html
+    print('Ponto de validação da pasta')
+    print(path.exists(today_date + '_html'))
+    if path.exists(today_date + '_html'):
+        filename = os.getcwd() + f'/{today_date}_html/' + papel + "_" + content_date + ".html"
+        f = open(filename, 'w', encoding="utf8")
+        f.write(str(content))    
+        f.close()
+    else:
+        os.mkdir(today_date + '_html')
     
     return
-
-
-
-
-# def erase_htmls():
-#     filenames = glob.glob(os.getcwd() + '/data/' + '*.csv')
-
-#     for file in filenames:
-#         os.remove(file)
-
-#     print('HTML files deleted')
-
-
 
 
 
@@ -185,7 +172,7 @@ def main():
             else:
             
                 # Realiza as coletas e salva os HTML, de 5 em 5 minutos
-                if minute % 5 == 0:
+                if minute % 2 == 0:
                     print(f"loop de coleta iniciado, em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
                     scrapper(URLs)
                     print(datetime.now(tz).strftime('%H:%M:%S'), 'fim deste loop. gc:', gc.get_count())
@@ -194,12 +181,14 @@ def main():
                     gc.collect()
                     print(f"Coleta realizada em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
                     print(f"Garbage Collector (gc): {gc.get_count()}")
-
+                    sleep(10)
+                else:
+                    sleep(10)
 
 
 
 
 if (__name__ == '__main__'):
-    lower_limit = datetime.strptime('08:00:00', '%H:%M:%S').strftime('%H:%M:%S')
-    upper_limit = datetime.strptime('18:00:00', '%H:%M:%S').strftime('%H:%M:%S')
+    lower_limit = datetime.strptime('09:30:00', '%H:%M:%S').strftime('%H:%M:%S')
+    upper_limit = datetime.strptime('16:00:00', '%H:%M:%S').strftime('%H:%M:%S')
     main()
