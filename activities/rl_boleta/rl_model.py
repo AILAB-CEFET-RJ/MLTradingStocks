@@ -26,6 +26,7 @@ class ReinforcementLearningAgent(gym.Env):
         self.reward_range = (0, MAX_ACCOUNT_BALANCE)
         self.debug = True
         self.qtd_episodios = 0
+        self.initial_amount = INITIAL_ACCOUNT_BALANCE
         self.final_amount = 0
         self.current_observation_price = 0
         self.last_observation_price = 0

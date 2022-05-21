@@ -32,11 +32,12 @@ def train_agent(training_file, iteration_number):
 
     gross_profit_plot(rl_training_agent.lucro_bruto, 'training', training_file, iteration_number)
 
-    with open('resultados.csv', 'w') as file:
-        file.write(f'base de treinamento: {training_file}\n')
-        file.write(f'treinamento - condição de parada: {rl_training_agent.stop_condition}\n')
-        file.write(f'quantidade de episódios terminais treino: {len(rl_training_agent.episodios)}\n')
-        file.write(f'recompensas treino: {sum(rl_training_agent.recompensas_por_acao_episodio)}\n')
-        file.write(f'valor inicial treino: {rl_training_agent.max_net_worth}\n')
-        file.write(f'valor final treino: {rl_training_agent.net_worth}\n')
-        file.write(f'lucro/prejuízo treino: {rl_training_agent.lucro_bruto}\n')
+    return {
+        'base de treinamento': training_file,
+        'treinamento - condição de parada': rl_training_agent.stop_condition,
+        'quantidade de episódios terminais treino': len(rl_training_agent.episodios),
+        'recompensas treino': sum(rl_training_agent.recompensas_por_acao_episodio),
+        'valor inicial treino': rl_training_agent.initial_amount,
+        'valor final treino': rl_training_agent.net_worth,
+        'lucro/prejuízo treino': (rl_training_agent.lucro_bruto[-1] - rl_training_agent.initial_amount)
+    }

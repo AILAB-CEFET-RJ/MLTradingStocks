@@ -43,11 +43,12 @@ def test_agent(filename, iteration_number):
     reward_plot(rl_testing_agent.recompensas_por_episodio, 'testing', filename, iteration_number)
     gross_profit_plot(rl_testing_agent.lucro_bruto, 'testing', filename, iteration_number)
 
-    with open('resultados.csv', 'w') as file:
-        file.write(f'base de teste: {filename}\n')
-        file.write(f'quantidade de episódios de teste: {len(rl_testing_agent.episodios)}\n')
-        file.write(f'recompensas teste: {sum(rl_testing_agent.recompensas_por_acao_episodio)}\n')
-        file.write(f'valor inicial teste: {rl_testing_agent.max_net_worth}\n')
-        file.write(f'valor final teste: {rl_testing_agent.net_worth}\n')
-        file.write(f'lucro/prejuízo teste: {rl_testing_agent.lucro_bruto}\n')
-        file.write(f'quantidade de passos teste: {int(len(testing_df)/10) - 6}\n')
+    return {
+        'base de teste': filename,
+        'quantidade de episódios teste': len(rl_testing_agent.episodios),
+        'recompensas teste': sum(rl_testing_agent.recompensas_por_acao_episodio),
+        'valor inicial teste': rl_testing_agent.initial_amount,
+        'valor final teste': rl_testing_agent.net_worth,
+        'lucro/prejuízo teste': (rl_testing_agent.lucro_bruto[-1] - rl_testing_agent.initial_amount),
+        'quantidade de passos teste': int(len(testing_df)/10) - 6
+    }
