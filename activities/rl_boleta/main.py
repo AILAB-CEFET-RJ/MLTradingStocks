@@ -22,7 +22,7 @@ for i in range(1):
 #     test_agent('consolidado_teste (23.03 a 28.03).csv')
     
     results = {**results_training, **results_testing}
-    if i == 1:
+    if i == 0:
         mode = 'w'
     else:
         mode = 'a'
