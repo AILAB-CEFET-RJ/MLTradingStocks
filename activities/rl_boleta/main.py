@@ -27,7 +27,7 @@ for i in range(50):
             else:
                 mode = 'a'
 
-            with open(f'{string_now}.csv', mode, encoding='UTF8', newline='') as file:
+            with open(f'./results/{string_now}.csv', mode, encoding='UTF8', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=header)
                 if i == 0 and file_testing == files_testing[0]:
                     writer.writeheader()
