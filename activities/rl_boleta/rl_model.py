@@ -71,11 +71,12 @@ class ReinforcementLearningAgent(gym.Env):
         
         
         # Set the current step to a random point within the dataframe
-        if self.mode == 'training':
-          self.deslocamento = random.randint(50, len(self.df)-10)
-        else:
-          if self.deslocamento == 0:
-            self.deslocamento = 50
+        # if self.mode == 'training':
+        #   self.deslocamento = 50, len(self.df)-10)
+        # else:
+        #   if self.deslocamento == 0:
+            # self.deslocamento = 50
+        self.deslocamento = 50
 
         print(f'len(self.df) = {len(self.df)}')
         print(f'self.deslocamento = {self.deslocamento}\n\n\n')

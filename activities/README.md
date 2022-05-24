@@ -37,199 +37,72 @@ Este trabalho leva em consideração as ações das seguintes empresas negociada
 - Delta Airlines
 - Newmont
 
-## Extração de cotações de ativos
-O arquivo get_quotations_new_selenium.py salva páginas HTML dos ativos considerados, por meio do acesso ao site do CBOE.
-O programa começa checando o horário e a data de execução. Caso esteja sendo executado no sábado ou no domingo, o mesmo entra em modo de latência. O mesmo ocorre de segunda a sexta-feira, caso o código seja executado em um horário fora do de operação. Cabe salientar que o horário de execução para o código ocorre das 09h às 16h. As checagens de continuidade para a latência ocorrem a cada 30 minutos, em que o trecho de código principal não estiver sendo executado.
-Por outro lado, caso o código não esteja em latência, o trecho principal (referente à coleta dos dados) será executado a cada 2 minutos, por meio da chamada ao método scrapper, passando como parâmetros as URL's referentes a cada uma das ações.
+## Extração de cotações de ativos (pasta get_quotations)
+O arquivo get_quotations_new_selenium.py salva páginas HTML dos ativos listados anteriormente, por meio do acesso ao site CBOE.
+
+O programa começa checando o horário e a data de execução. Caso esteja sendo executado no sábado ou no domingo, o mesmo entra em modo de latência. O mesmo ocorre de segunda a sexta-feira, caso o código seja executado em um horário fora do de operação (ajustado para operar das 09h às 16h, em dias úteis - quando a bolsa norte-americana costuma estar em operação). Quando em modo de latência, o programa realiza checagens de 30 em 30 minutos, com o objetivo de checar se deverá sair ou continuar em modo de latência.
+
+Por outro lado, caso o código não esteja em latência, o trecho principal (referente à coleta dos dados) será executado a cada 2 minutos, por meio da chamada ao método *scrapper*, passando como parâmetros as URL's referentes a cada uma das ações.
+
+O programa utiliza um total de 10 threads, de modo a executar o processamento das páginas de forma paralela. Para cada thread, o programa usa o webdriver do Firefox com a opção *headless*, que impede o navegador de ficar visível (e que foi crucial para este trabalho, visto que o programa roda em um servidor remoto Linux, sem interface gráfica). Após carregar o driver, o programa aguarda 30 segundos (de forma que não haja coleta de página para uma mesma ação mais do que uma vez, dentro de um determinado minuto) e espera os elementos da página serem renderizados, para que páginas vazias não sejam salvas. Caso não haja carregamento de elementos, o programa ainda tenta carregar a página outras 10 vezes.
+
+Por fim, o driver é encerrado e o html (caso tenha sido coletado) é salvo na pasta html.
 
 
-## Tratamento e conversão dos dados coletados
+## Tratamento e conversão dos dados coletados (pasta treatment_extraction)
+Para realizar o tratamento e a conversão dos dados nos arquivos .html, há 2 etapas principais:
+1. Checagem de consistência e limpeza dos arquivos .html
+2. Extração das tags dos arquivos .html
 
-## Aplicação de agente de Apredizado por Reforço
+Com relação à checagem de consistência e limpeza dos arquivos HTML, o arquivo *html_files_check.py* é utilizado. O arquivo em questão considera a existência da pasta ***html_files*** (que foi criada no servidor), que contém pastas que representam os dias de coleta de dados. Para cada uma dessas pastas, há os arquivos HTML salvos para cada uma das 20 empresas, para os horários de coleta descritos anteriormente e os intervalos de 2 minutos considerados.
+
+Para cada um dos ativos considerados, o arquivo percorre cada uma das pastas dentro da pasta *html_files* e, dentro de cada uma dessas pastas, verifica se cada um dos arquivos HTML correspondentes ao ativo em questão foram salvos corretamente (considerando arquivos não vazios e com o ativo correspondendo ao ativo salvo no HTML). Os arquivos salvos incorretamente (arquivos vazios ou com dados incorretos) são eliminados.
+
+O arquivo de extração das tags é o *tags_extraction.py*, sendo inicializado chamando a função de checagem dos arquivos HTML, contida no arquivo *html_files_check.py*. Após checagem e sanitização dos arquivos, há novamente o percorrimento da pasta ***html_files***, suas pastas sucessoras e seus arquivos correspondentes. Então, os dados alimentadores do modelo de Reinforcement Learning (Aprendizagem por Reforço) serão moldados, considerando-se a seguinte estrutura:
+- Data do Arquivo
+- Ticker
+- Dia
+- Quantidade de Ações (cotas)
+- Preços
+- Hora
+- Minuto
+- Segundo
+- Últimos 10 preços
+- Últimas 10 cotas de ações
+
+Cada uma das colunas é previamente tratada, com remoção de vírgulas de valores, caracteres de espaços de no-break, transposição do vetor de dados e salvamento dos dados ajustados e tratados em arquivos com extensão .csv (*comma separated values*).
 
 
-Dillinger is a cloud-enabled, mobile-ready, offline-storage compatible,
-AngularJS-powered HTML5 Markdown editor.
+## Aplicação de agente de Apredizado por Reforço (pasta rl_boleta)
+A seção de Aprendizado por Reforço foi segmentada de acordo com as seguintes funcionalidades:
+- Função Principal
+- Modelo de Reinforcement Learning
+- Treinamento de Dados
+- Teste de Dados
+- Tratamento de Dados (CSV)
+- Plotagem de gráficos
 
-- Type some Markdown on the left
-- See HTML in the right
-- ✨Magic ✨
+A função principal (*main.py*) é o ponto centralizador, em que são definidos os arquivos csv utilizados para treinamento e teste dos dados salvos nos arquivos CSV. Além disso, neste arquivo são definidas a quantidade de vezes em que treinamentos e testes serão executados, com o objetivo de avaliar a eficácia média e outras observações estatísticas para o modelo utilizado.
 
-## Features
+O treinamento do modelo, antes de ser inicializado, realiza a leitura dos CSVs e cria um dataframe correspondente, como forma de garantir a consistência e a transmissão de dados. Na sequência, o modelo de Aprendizagem por Reforço é inicializado, passando-se o dataframe obtido do CSV como parâmetro. O modelo então é treinado, por uma quantidade de passos que pode ser variável, e por fim, salvo. Posteriormente, há a realização e o salvamento das plotagens e o retorno da função de treinamento, por meio de um JSON.
 
-- Import a HTML file and watch it magically convert to Markdown
-- Drag and drop images (requires your Dropbox account be linked)
-- Import and save files from GitHub, Dropbox, Google Drive and One Drive
-- Drag and drop markdown and HTML files into Dillinger
-- Export documents as Markdown, HTML and PDF
+A realização de testes do modelo é feita de forma similar, com leitura dos CSVs e criação de dataframes correspondentes, inicialização do agente de testes, carregamento do modelo salvo na parte de treinamento e execução dos testes. Na execução dos testes (assim como no treinamento), os dataframes são segmentados de 10 em 10 colunas, uma vez que cada linha representa:
+- Data do Arquivo
+- Ticker
+- Dia
+- Quantidade de Ações (cotas)
+- Preços
+- Hora
+- Minuto
+- Segundo
+- Últimos 10 preços
+- Últimas 10 cotas de ações
 
-Markdown is a lightweight markup language based on the formatting conventions
-that people naturally use in email.
-As [John Gruber] writes on the [Markdown site][df1]
+E cada coluna representa cada um dos valores das linhas (que chega a 10).
+Nos testes, a extensão dos data frames deve ser subtraída de 6, uma vez que os testes começam a partir da sexto observação (pois o programa considera 5 observações anteriores mais a observação atual). Assim, caso a extensão dos dataframes seja total, o programa acabará considerando também as observações iniciais, ou seja, irá das últimas observações para as cinco primeiras, o que estaria fundamentalmente errado.
 
-> The overriding design goal for Markdown's
-> formatting syntax is to make it as readable
-> as possible. The idea is that a
-> Markdown-formatted document should be
-> publishable as-is, as plain text, without
-> looking like it's been marked up with tags
-> or formatting instructions.
+Após a execução dos testes, há a plotagem dos gráficos e o posterior retorno dos dados, em formato JSON.
 
-This text you see here is *actually- written in Markdown! To get a feel
-for Markdown's syntax, type some text into the left window and
-watch the results in the right.
+Os retornos, tanto do treinamento quanto dos testes, são aglutinados e salvos em um csv consolidado de resultados.
 
-## Tech
-
-Dillinger uses a number of open source projects to work properly:
-
-- [AngularJS] - HTML enhanced for web apps!
-- [Ace Editor] - awesome web-based text editor
-- [markdown-it] - Markdown parser done right. Fast and easy to extend.
-- [Twitter Bootstrap] - great UI boilerplate for modern web apps
-- [node.js] - evented I/O for the backend
-- [Express] - fast node.js network app framework [@tjholowaychuk]
-- [Gulp] - the streaming build system
-- [Breakdance](https://breakdance.github.io/breakdance/) - HTML
-to Markdown converter
-- [jQuery] - duh
-
-And of course Dillinger itself is open source with a [public repository][dill]
- on GitHub.
-
-## Installation
-
-Dillinger requires [Node.js](https://nodejs.org/) v10+ to run.
-
-Install the dependencies and devDependencies and start the server.
-
-```sh
-cd dillinger
-npm i
-node app
-```
-
-For production environments...
-
-```sh
-npm install --production
-NODE_ENV=production node app
-```
-
-## Plugins
-
-Dillinger is currently extended with the following plugins.
-Instructions on how to use them in your own application are linked below.
-
-| Plugin | README |
-| ------ | ------ |
-| Dropbox | [plugins/dropbox/README.md][PlDb] |
-| GitHub | [plugins/github/README.md][PlGh] |
-| Google Drive | [plugins/googledrive/README.md][PlGd] |
-| OneDrive | [plugins/onedrive/README.md][PlOd] |
-| Medium | [plugins/medium/README.md][PlMe] |
-| Google Analytics | [plugins/googleanalytics/README.md][PlGa] |
-
-## Development
-
-Want to contribute? Great!
-
-Dillinger uses Gulp + Webpack for fast developing.
-Make a change in your file and instantaneously see your updates!
-
-Open your favorite Terminal and run these commands.
-
-First Tab:
-
-```sh
-node app
-```
-
-Second Tab:
-
-```sh
-gulp watch
-```
-
-(optional) Third:
-
-```sh
-karma test
-```
-
-#### Building for source
-
-For production release:
-
-```sh
-gulp build --prod
-```
-
-Generating pre-built zip archives for distribution:
-
-```sh
-gulp build dist --prod
-```
-
-## Docker
-
-Dillinger is very easy to install and deploy in a Docker container.
-
-By default, the Docker will expose port 8080, so change this within the
-Dockerfile if necessary. When ready, simply use the Dockerfile to
-build the image.
-
-```sh
-cd dillinger
-docker build -t <youruser>/dillinger:${package.json.version} .
-```
-
-This will create the dillinger image and pull in the necessary dependencies.
-Be sure to swap out `${package.json.version}` with the actual
-version of Dillinger.
-
-Once done, run the Docker image and map the port to whatever you wish on
-your host. In this example, we simply map port 8000 of the host to
-port 8080 of the Docker (or whatever port was exposed in the Dockerfile):
-
-```sh
-docker run -d -p 8000:8080 --restart=always --cap-add=SYS_ADMIN --name=dillinger <youruser>/dillinger:${package.json.version}
-```
-
-> Note: `--capt-add=SYS-ADMIN` is required for PDF rendering.
-
-Verify the deployment by navigating to your server address in
-your preferred browser.
-
-```sh
-127.0.0.1:8000
-```
-
-## License
-
-MIT
-
-**Free Software, Hell Yeah!**
-
-[//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
-
-   [dill]: <https://github.com/joemccann/dillinger>
-   [git-repo-url]: <https://github.com/joemccann/dillinger.git>
-   [john gruber]: <http://daringfireball.net>
-   [df1]: <http://daringfireball.net/projects/markdown/>
-   [markdown-it]: <https://github.com/markdown-it/markdown-it>
-   [Ace Editor]: <http://ace.ajax.org>
-   [node.js]: <http://nodejs.org>
-   [Twitter Bootstrap]: <http://twitter.github.com/bootstrap/>
-   [jQuery]: <http://jquery.com>
-   [@tjholowaychuk]: <http://twitter.com/tjholowaychuk>
-   [express]: <http://expressjs.com>
-   [AngularJS]: <http://angularjs.org>
-   [Gulp]: <http://gulpjs.com>
-
-   [PlDb]: <https://github.com/joemccann/dillinger/tree/master/plugins/dropbox/README.md>
-   [PlGh]: <https://github.com/joemccann/dillinger/tree/master/plugins/github/README.md>
-   [PlGd]: <https://github.com/joemccann/dillinger/tree/master/plugins/googledrive/README.md>
-   [PlOd]: <https://github.com/joemccann/dillinger/tree/master/plugins/onedrive/README.md>
-   [PlMe]: <https://github.com/joemccann/dillinger/tree/master/plugins/medium/README.md>
-   [PlGa]: <https://github.com/RahulHP/dillinger/blob/master/plugins/googleanalytics/README.md>
+Por fim, o modelo de Aprendizagem por Reforço considera, além da inicialização da classe, as funções de reset, próxima observação, passo, tomada de ação e renderização.
