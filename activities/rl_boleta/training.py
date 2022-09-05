@@ -1,67 +1,133 @@
+from random import seed
 from data_treatment import treat_data
 from stable_baselines3.sac.policies import MlpPolicy
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3 import PPO
-import rl_model
-from rl_model import ReinforcementLearningAgent
-from plot import gross_profit_plot, plot_reward, reward_plot
-import csv
+from rl_model_menor import ReinforcementLearningEnv
+from plot import plot_lucro_bruto, plot_qtde_acumulada_cotas_compradas_vendidas, plot_qtde_acumulada_decisoes_agente, plot_reward, plot_lucro_liquido, plot_qtde_acoes_posse
+import numpy as np
 import pdb
 
-def train_agent(training_files, iteration_number):
+DIAS_TESTE = 7
 
-    results = []
 
+def train_agent(training_files, repetitive_iteration_number):
+
+    agg_timesteps = 0
+    absolute_initial_balance = 10000.00
+    initial_amount = 10000.00
+    balance = initial_amount
+    stp_condition = 0.8
+    base_treinamento = []
+    episodios_terminais_treino = 0
+    recompensas_totais_treino = 0
+    episodios = []
+    recompensas_por_acao_episodio = []
+    lucro_bruto = []
+    lucro_liquido = []
+    current_step = 0
+    shares_held_array = []
+    acoes_compradas = []
+    acoes_vendidas = []
+    actions_array = []
+
+    max_steps = 0
     for file in training_files:
         training_df = treat_data(file)
+        timesteps = int(len(training_df)/10)
+        max_steps += timesteps
 
-        rl_training_agent = ReinforcementLearningAgent(training_df)
+
+    for file in training_files:
+
+        # pdb.set_trace()
+        base_treinamento.append(file)
+
+        training_df = treat_data(file)
+        timesteps = int(2*int(len(training_df)/10))
+
+        index = training_files.index(file)
+
+
+        rl_training_agent = ReinforcementLearningEnv('training', training_df, initial_amount, stp_condition, episodios, 
+        recompensas_por_acao_episodio, lucro_bruto, lucro_liquido, current_step, max_steps, shares_held_array, acoes_compradas, 
+        acoes_vendidas, actions_array)
+        
         env_training = DummyVecEnv([lambda: rl_training_agent])
 
-        timesteps = int(len(training_df)/10 * 2)
-
-        if file == training_files[0]:
+        # env_training.reset()
+        if index == 0:
             model = PPO("MlpPolicy", env_training, verbose=1)
 
         else:
-            env_training.reset()
             model.set_env(env_training)
 
+        # model.set_random_seed(seed=5)
+        # pdb.set_trace()
         model.learn(total_timesteps = timesteps)
 
-        plot_reward(rl_training_agent.recompensas_por_acao_episodio, 'training', file, iteration_number)
+        # pdb.set_trace()
+        initial_amount = rl_training_agent.net_worth
+        balance = rl_training_agent.balance
+        episodios_terminais_treino += len(rl_training_agent.episodios)
+        recompensas_totais_treino += np.sum(rl_training_agent.recompensas_por_acao_episodio)
+        
+        episodios = rl_training_agent.episodios
+        recompensas_por_acao_episodio = rl_training_agent.recompensas_por_acao_episodio
+        lucro_bruto = rl_training_agent.gross_profit_array
+        lucro_liquido = rl_training_agent.net_profit_array
+        current_step = rl_training_agent.passo_atual_total
+        shares_held_array = rl_training_agent.shares_held_array
+        acoes_compradas = rl_training_agent.acoes_compradas
+        acoes_vendidas = rl_training_agent.acoes_vendidas
+        actions_array = rl_training_agent.actions_array
 
-        reward_plot(rl_training_agent.recompensas_por_episodio, 'training', file, iteration_number)
+        buy_action_array = []
+        hold_action_array = []
+        sell_action_array = []
 
-        gross_profit_plot(rl_training_agent.lucro_bruto, 'training', file, iteration_number)
+        for action in actions_array:
+            buy_action_array.append(action if 0 <= action < 1 else 0)
+            hold_action_array.append(action if 1 <= action < 2 else 0)
+            sell_action_array.append(action if 2 <= action <= 3 else 0)
 
-        result = {
-            'base de treinamento': file,
-            'treinamento - condição de parada': rl_training_agent.stop_condition,
-            'quantidade de episódios terminais treino': len(rl_training_agent.episodios),
-            'recompensas treino': sum(rl_training_agent.recompensas_por_acao_episodio),
-            'valor inicial treino': rl_training_agent.initial_amount,
-            'valor final treino': rl_training_agent.net_worth,
-            'lucro/prejuízo treino': (rl_training_agent.lucro_bruto[-1] - rl_training_agent.initial_amount)
-        }
 
-        results.append(result)
+        if training_files.index(file) == (len(training_files) - 1):
+            plot_reward(recompensas_por_acao_episodio, 'training', file, repetitive_iteration_number)
+            plot_lucro_liquido(lucro_liquido, 'training', file, repetitive_iteration_number)
+            plot_lucro_bruto(lucro_bruto, 'training', file, repetitive_iteration_number)
+            plot_qtde_acoes_posse(rl_training_agent.shares_held_array, 'training', file, repetitive_iteration_number)
+            plot_qtde_acumulada_cotas_compradas_vendidas(acoes_compradas, acoes_vendidas, 'training', file, repetitive_iteration_number)
+            plot_qtde_acumulada_decisoes_agente(buy_action_array, hold_action_array, sell_action_array, 'training', file, repetitive_iteration_number)
 
-    model.save('rl_trading_stocks')
+        env_training.close()
+
+    model.save(f'rl_trading_stocks_iteracao{repetitive_iteration_number}')
+
+
+    training_testing_results = {
+        'base de treinamento': base_treinamento,
+        'passos de treinamento': agg_timesteps,
+        'numero da iteracao': repetitive_iteration_number + 1,
+        'treinamento - condição de parada': stp_condition,
+        'quantidade de episódios terminais treino': episodios_terminais_treino,
+        'recompensas treino': recompensas_totais_treino,
+        'valor inicial treino': absolute_initial_balance,
+        'valor final treino': rl_training_agent.net_worth,
+        'lucro/prejuízo treino': (rl_training_agent.net_worth - absolute_initial_balance)
+    }
+
+    # testing_results = test_agent(testing_files[0], model, DIAS_TESTE, repetitive_iteration_number)
+
+    # training_testing_results.update(testing_results)
+
+
+
+    # pdb.set_trace()
 
     del model
     
-    return results
-
-    # print(rl_training_agent.episodios)
-
-    # print(f"A quantidade de terminal conditions (episódios terminais) no treinamento é de {len(rl_training_agent.episodios)}.")
-
-    # plot_reward(rl_training_agent.recompensas_por_acao_episodio, 'training', training_file, iteration_number)
-
-    # reward_plot(rl_training_agent.recompensas_por_episodio, 'training', training_file, iteration_number)
-
-    # gross_profit_plot(rl_training_agent.lucro_bruto, 'training', training_file, iteration_number)
+    return training_testing_results
 
 
     # pdb.set_trace()

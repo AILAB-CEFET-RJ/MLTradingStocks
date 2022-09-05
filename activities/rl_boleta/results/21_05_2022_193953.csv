@@ -1,5 +1,0 @@
-run,base de treinamento,treinamento - condição de parada,quantidade de episódios terminais treino,recompensas treino,valor inicial treino,valor final treino,lucro/prejuízo treino,base de teste,quantidade de episódios teste,recompensas teste,valor inicial teste,valor final teste,lucro/prejuízo teste,quantidade de passos teste
-1,consolidado_treinamento (01.12 a 06.12).csv,0.95,0,10,10000.0,10730.085000000001,730.085000000001,consolidado_teste (10.01 a 14.01).csv,0,54,10000.0,10000.0,0.0,1914
-1,consolidado_treinamento (01.12 a 06.12).csv,0.95,0,10,10000.0,10730.085000000001,730.085000000001,consolidado_teste (18.01 a 26.01).csv,0,-56,10000.0,10000.0,0.0,2002
-1,consolidado_treinamento (01.12 a 06.12).csv,0.95,0,10,10000.0,10730.085000000001,730.085000000001,consolidado_teste (21.02 a 11.03).csv,0,-92,10000.0,10000.0,0.0,5279
-1,consolidado_treinamento (01.12 a 06.12).csv,0.95,0,10,10000.0,10730.085000000001,730.085000000001,consolidado_teste (23.03 a 28.03).csv,0,63,10000.0,10000.0,0.0,1448
