@@ -12,17 +12,17 @@ header = ['run', 'base de treinamento', 'passos de treinamento', 'numero da iter
 'recompensas treino', 'valor inicial treino', 'valor final treino', 'lucro/prejuízo treino', 'base de teste', 'quantidade de dias', \
 'numero da iteracao teste', 'quantidade de episódios teste', 'recompensas teste', 'valor inicial teste', 'valor final teste', 'lucro/prejuízo teste', \
 'quantidade de passos teste']
-files_training = ['consolidado_treinamento (01.12 a 06.12).csv', 'consolidado_treinamento (10.01 a 14.01).csv', \
-    'consolidado_treinamento (18.01 a 26.01).csv', 'consolidado_treinamento (21.02 a 11.03).csv', \
-    'consolidado_treinamento (23.03 a 28.03).csv', 'consolidado_treinamento (07.04 a 15.04).csv',
-    'consolidado_treinamento (18.04 a 29.04).csv']
+files_training = ['csvs/consolidado_treinamento (01.12 a 06.12).csv', 'csvs/consolidado_treinamento (10.01 a 14.01).csv', \
+    'csvs/consolidado_treinamento (18.01 a 26.01).csv', 'csvs/consolidado_treinamento (21.02 a 11.03).csv', \
+    'csvs/consolidado_treinamento (23.03 a 28.03).csv', 'csvs/consolidado_treinamento (07.04 a 15.04).csv',
+    'csvs/consolidado_treinamento (18.04 a 29.04).csv']
 
 
 # files_testing = ['consolidado_treinamento (21.02 a 11.03).csv']
 # files_testing = ['consolidado_treinamento (23.03 a 28.03).csv']
 # files_testing = ['consolidado_treinamento (07.04 a 15.04).csv']
 # files_testing = ['consolidado_treinamento (18.04 a 29.04).csv']
-files_testing = ['consolidado_teste (02.05 a 13.05).csv']
+files_testing = ['csvs/consolidado_teste (02.05 a 13.05).csv']
 
 
 string_now = datetime.now().strftime('%d_%m_%Y_%H:%M:%S')

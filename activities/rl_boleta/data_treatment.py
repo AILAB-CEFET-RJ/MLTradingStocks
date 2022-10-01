@@ -5,7 +5,7 @@ import numpy as np
 quantidade_dias = 0
 
 def treat_data(filename):
-    outer_df = pd.read_csv(f'csvs/{filename}', thousands=',', error_bad_lines=False)
+    outer_df = pd.read_csv(f'{filename}', thousands=',', error_bad_lines=False)
     outer_df = outer_df.sort_values('File Date')
     outer_df = outer_df[outer_df['Ticker'] == 'AAPL']
     outer_df = outer_df[outer_df['Prices'] < 1000.00]
@@ -22,7 +22,7 @@ def treat_data(filename):
 
 
 def treat_testing_data(filename, quantidade_dias_teste, repetitive_iteration_number):
-    outer_df = pd.read_csv(f'csvs/{filename}', thousands=',', error_bad_lines=False)
+    outer_df = pd.read_csv(f'{filename}', thousands=',', error_bad_lines=False)
     outer_df = outer_df.sort_values('File Date')
 
 
