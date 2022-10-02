@@ -1,4 +1,5 @@
 import random
+import math
 
 def reward_zone_1(step_atual, max_steps, current_observation_price, last_observation_price, shares_held, action_type, quantidade_executada):
     # REWARD ZONE:
@@ -18,9 +19,9 @@ def reward_zone_1(step_atual, max_steps, current_observation_price, last_observa
 
     
 
-    compra = 0 <= action_type < 1
-    neutro = 1 <= action_type <= 2
-    venda = 2 <= action_type <= 3
+    compra = 0 < action_type < 1
+    neutro = action_type == 0
+    venda = -1 <= action_type < 0
 
     # hold_reward = -1 if (self.sem_recursos) else 0
 
@@ -55,3 +56,10 @@ def reward_zone_1(step_atual, max_steps, current_observation_price, last_observa
 def reward_zone_2(step_atual, max_steps, current_observation_price, last_observation_price, shares_held, action_type, quantidade_executada):
     random_reward = random.uniform(-1, 1)
     return random_reward
+
+def reward_zone_net_worth(step_atual, max_steps, net_worth):
+    delay_modifier = (step_atual / max_steps)
+
+    # reward_step = net_worth * delay_modifier
+    reward_step = net_worth
+    return reward_step

@@ -13,8 +13,6 @@ MAX_NUM_SHARES, MAX_SHARE_PRICE, MAX_TIME_HOUR, MAX_TIME_MINUTE, MAX_TIME_SECOND
 # Initial variables setup
 ABSOLUTE_INITIAL_ACCOUNT = 10000.00
 MAX_ACCOUNT_BALANCE = ABSOLUTE_INITIAL_ACCOUNT * 1.6
-# MAX_ACCOUNT_BALANCE = 10000
-# MIN_ACCOUNT_BALANCE = -10000
 
 
 class ReinforcementLearningEnv(gym.Env):
@@ -84,6 +82,7 @@ class ReinforcementLearningEnv(gym.Env):
         self.acoes_vendidas = [0]
         self.actions_array = []
         self.sem_recursos = False
+        self.deslocamento = 50
         
         return self._next_observation()
 
