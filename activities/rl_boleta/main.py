@@ -29,7 +29,7 @@ string_now = datetime.now().strftime('%d_%m_%Y_%H:%M:%S')
 
 
 # Laço iterativo para realizar 30 treinamentos e testes, para cada quantidade de timesteps
-for j in range(10):
+for j in range(2):
     results_training = train_agent(files_training, j)
 
     results_testing = test_agent(files_testing[0], DIAS_TESTE, j)
@@ -50,9 +50,3 @@ for j in range(10):
         if j == 0:
             writer.writeheader()
         writer.writerow(results)
-
-
-# Iteração nos testes (mínimo 30)
-# Quantidade de dias de operação do agente (horizontes temporais diferentes - 5, 10 e 15 dias?)
-# Treinos em separado e treinos com arquivos seguidos (caso feche os outros pontos com sucesso, e se fizer sentido)
-# Plotar o gráfico de recompensas com o delay modifier, para o treinamento

@@ -10,11 +10,9 @@ import os
 
 def test_agent(filename, quantidade_dias_teste, repetitive_iteration_number):
 
-    # pdb.set_trace()
-
     testing_df = treat_testing_data(filename, quantidade_dias_teste, repetitive_iteration_number)
 
-    rl_testing_agent = ReinforcementLearningEnv('testing', testing_df)
+    rl_testing_agent = ReinforcementLearningEnv('testing', testing_df, 0.0, 0.8, [], [], [], [], 0, 100000, [], [0], [0], [])
 
     env_teste = DummyVecEnv([lambda: rl_testing_agent])
     observation = env_teste.reset()
@@ -52,9 +50,9 @@ def test_agent(filename, quantidade_dias_teste, repetitive_iteration_number):
     sell_action_array = []
 
     for action in rl_testing_agent.actions_array:
-        buy_action_array.append(action if 0 <= action < 1 else 0)
-        hold_action_array.append(action if 1 <= action < 2 else 0)
-        sell_action_array.append(action if 2 <= action <= 3 else 0)
+            buy_action_array.append(1 if 0 < action <= 1 else 0)
+            hold_action_array.append(1 if action == 0 else 0)
+            sell_action_array.append(1 if -1 <= action < 0 else 0)
 
 
     plot_reward(rl_testing_agent.recompensas_por_acao_episodio, 'testing', filename, repetitive_iteration_number)
@@ -84,6 +82,3 @@ def test_agent(filename, quantidade_dias_teste, repetitive_iteration_number):
     os.remove(f'rl_trading_stocks_iteracao{repetitive_iteration_number}.zip')
 
     return testing_results
-
-    # Média e desvpad do valor acumulado
-    
