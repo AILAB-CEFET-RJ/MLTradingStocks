@@ -6,6 +6,7 @@ import math
 from reward_zone.net_worth_reward import NetWorthReward
 from reward_zone.carry_action_reward import CarryAndActionReward
 from reward_zone.random_reward import RandomReward
+from reward_zone.local_reward import LocalReward
 from get_df_statistics import get_max_values
 
 # Função que avalia os valores máximos para cada uma das variáveis dos dataframes
@@ -193,7 +194,7 @@ class ReinforcementLearningEnv(gym.Env):
                 # print(shares_sold)
                 self.balance += shares_sold * self.current_observation_price
                 self.shares_held -= shares_sold
-                self.quantidade_executada = shares_sold
+                self.quantidade_executada = - shares_sold
                 self.acoes_vendidas.append(shares_sold)
                 self.acoes_compradas.append(0)
 
