@@ -14,13 +14,12 @@ DIAS_TESTE = 7
 def train_agent(training_files, repetitive_iteration_number):
 
     agg_timesteps = 0
-    absolute_initial_balance = 10000.00
+    absolute_initial_balance = 0.00
     initial_amount = 0.0
     balance = initial_amount
     stp_condition = 0.8
     base_treinamento = []
     episodios_terminais_treino = 0
-    recompensas_totais_treino = 0
     episodios = []
     recompensas_por_acao_episodio = []
     lucro_bruto = []
@@ -69,7 +68,6 @@ def train_agent(training_files, repetitive_iteration_number):
         initial_amount = rl_training_agent.net_worth
         balance = rl_training_agent.balance
         episodios_terminais_treino += len(rl_training_agent.episodios)
-        recompensas_totais_treino += np.sum(rl_training_agent.recompensas_por_acao_episodio)
         episodios = rl_training_agent.episodios
         recompensas_por_acao_episodio = rl_training_agent.recompensas_por_acao_episodio
         lucro_bruto = rl_training_agent.gross_profit_array
@@ -111,10 +109,10 @@ def train_agent(training_files, repetitive_iteration_number):
         'numero da iteracao': repetitive_iteration_number + 1,
         'treinamento - condição de parada': stp_condition,
         'quantidade de episódios terminais treino': episodios_terminais_treino,
-        'recompensas treino': recompensas_totais_treino,
+        'recompensas treino': recompensas_por_acao_episodio[-1],
         'valor inicial treino': absolute_initial_balance,
-        'valor final treino': rl_training_agent.net_worth,
-        'lucro/prejuízo treino': (rl_training_agent.net_worth - absolute_initial_balance)
+        'valor final treino': lucro_bruto[-1],
+        'lucro/prejuízo treino': lucro_liquido[-1]
     }
 
     # testing_results = test_agent(testing_files[0], model, DIAS_TESTE, repetitive_iteration_number)

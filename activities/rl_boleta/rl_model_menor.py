@@ -134,7 +134,7 @@ class ReinforcementLearningEnv(gym.Env):
 
         next_observation = self._next_observation()
 
-        reward = NetWorthReward(self)
+        reward = LocalReward(self)
         reward_step = reward.calculate_reward()
 
         self.recompensas_por_acao_episodio.append(reward_step)

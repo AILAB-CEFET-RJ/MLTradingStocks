@@ -28,7 +28,7 @@ files_testing = ['consolidado_teste (02.05 a 13.05).csv']
 string_now = datetime.now().strftime('%d_%m_%Y_%H:%M:%S')
 
 
-for j in range(50):
+for j in range(1):
     results_training = train_agent(files_training, j)
 
     results_testing = test_agent(files_testing[0], DIAS_TESTE, j)

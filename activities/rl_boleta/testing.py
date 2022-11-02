@@ -68,10 +68,10 @@ def test_agent(filename, quantidade_dias_teste, repetitive_iteration_number):
         'quantidade de dias': quantidade_dias_teste,
         'numero da iteracao teste': repetitive_iteration_number + 1,
         'quantidade de episódios teste': len(rl_testing_agent.episodios),
-        'recompensas teste': sum(rl_testing_agent.recompensas_por_acao_episodio),
+        'recompensas teste': rl_testing_agent.recompensas_por_acao_episodio[-1],
         'valor inicial teste': rl_testing_agent.initial_amount,
-        'valor final teste': rl_testing_agent.net_worth,
-        'lucro/prejuízo teste': (rl_testing_agent.gross_profit_array[-1] - rl_testing_agent.initial_amount),
+        'valor final teste': rl_testing_agent.gross_profit_array[-1],
+        'lucro/prejuízo teste': rl_testing_agent.net_profit_array[-1],
         'quantidade de passos teste': int(len(testing_df)/10) - 6
     }
 
