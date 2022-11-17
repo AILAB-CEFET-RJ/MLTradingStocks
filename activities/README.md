@@ -106,3 +106,14 @@ Após a execução dos testes, há a plotagem dos gráficos e o posterior retorn
 Os retornos, tanto do treinamento quanto dos testes, são aglutinados e salvos em um csv consolidado de resultados.
 
 Por fim, o modelo de Aprendizagem por Reforço considera, além da inicialização da classe, as funções de reset, próxima observação, passo, tomada de ação e renderização.
+
+## Como executar treinamento/teste do modelo
+1. Acessar o servidor Aquarii ou Arietis
+1.1 No Aquarii, acessar ~/data_extraction/data_extraction/activities/rl_boleta
+2. Verificar os screens existentes ('screen -ls' - SEM AS ASPAS)
+2.1 Caso exista um screen com o nome x, acessá-lo, por meio do comando 'screen -r x' (SEM AS ASPAS)
+2.2 Caso não exista, criar um novo screen com o nome de x e acessá-lo, por meio do comando 'screen -r x' (SEM AS ASPAS)
+3. Digitar o comando 'conda activate ai_env' (SEM AS ASPAS), para ativar o ambiente que contém as instalações feitas para rodar treinamentos/testes
+4. Acessar a pasta rl_boleta
+5. Rodar o comando 'python3 main.py' (SEM AS ASPAS), para realizar o treinamento/teste
+5.1 Caso haja a necessidade de alterar os arquivos de treinamento e/ou teste, alterar o arquivo main.py

@@ -15,9 +15,7 @@ class NetWorthReward(IRewards):
     
     # É praticamente igual ao gráfico de lucro líquido
     def calculate_reward(self):
-        delay_modifier = (self.step_atual / self.max_steps)
-        # reward_step = net_worth * delay_modifier
-        reward_step = self.net_worth
+        reward_step = self.net_worth - self.net_worth_anterior
         return reward_step
     
     def calculate_local_reward(self):

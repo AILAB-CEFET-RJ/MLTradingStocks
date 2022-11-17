@@ -2,7 +2,6 @@ import rl_model_menor
 import numpy as np
 import matplotlib as mp
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter
 
 def plot_reward(rewards_per_action_episode, mode, filename, repetitive_iteration_number):
     cumulative = np.cumsum(rewards_per_action_episode)
