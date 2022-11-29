@@ -12,6 +12,8 @@ from get_df_statistics import get_max_values
 # Função que avalia os valores máximos para cada uma das variáveis dos dataframes
 MAX_NUM_SHARES, MAX_SHARE_PRICE, MAX_TIME_HOUR, MAX_TIME_MINUTE, MAX_TIME_SECOND, LAST_10_PRICES, LAST_10_SHARES = get_max_values()
 
+# Quantidade de transições passadas observadas
+OBSERVATION_WINDOW = 5
 
 # Initial account variables setup
 ABSOLUTE_INITIAL_ACCOUNT = 0.00
@@ -36,7 +38,7 @@ class ReinforcementLearningEnv(gym.Env):
         self.net_worth_anterior = 0.0
         self.current_observation_price = 0
         self.last_observation_price = 0
-        self.deslocamento = 50
+        self.deslocamento = OBSERVATION_WINDOW * 10
         self.passo_atual_total = current_step
         self.passos = []
         self.net_profit_amount = 0
@@ -67,7 +69,8 @@ class ReinforcementLearningEnv(gym.Env):
 
     def reset(self):
         # Reset the state of the environment to an initial state
-        self.deslocamento = 50
+
+        self.deslocamento = OBSERVATION_WINDOW * 10
         self.initial_amount = 0.0
         # self.balance = 10000.00
         # self.net_worth = 10000.00
@@ -93,13 +96,13 @@ class ReinforcementLearningEnv(gym.Env):
         # Get the data points for the last 5 observations and the current one, and scale to between 0-1
     
         frame = np.array([
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Shares'] / MAX_NUM_SHARES,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Prices'] / MAX_SHARE_PRICE,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Time_Hour'] / MAX_TIME_HOUR,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Time_Minute'] / MAX_TIME_MINUTE,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Time_Second'] / MAX_TIME_SECOND,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Last_10_Prices'] / LAST_10_PRICES,
-            self.df.loc[self.deslocamento - 50: self.deslocamento + 9, 'Last_10_Shares'] / LAST_10_SHARES
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Shares'] / MAX_NUM_SHARES,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Prices'] / MAX_SHARE_PRICE,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Time_Hour'] / MAX_TIME_HOUR,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Time_Minute'] / MAX_TIME_MINUTE,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Time_Second'] / MAX_TIME_SECOND,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Last_10_Prices'] / LAST_10_PRICES,
+            self.df.loc[self.deslocamento - (OBSERVATION_WINDOW * 10): self.deslocamento + 9, 'Last_10_Shares'] / LAST_10_SHARES
         ])
 
         # pdb.set_trace()
