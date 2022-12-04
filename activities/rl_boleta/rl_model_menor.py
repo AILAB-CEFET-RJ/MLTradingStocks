@@ -13,7 +13,7 @@ from get_df_statistics import get_max_values
 MAX_NUM_SHARES, MAX_SHARE_PRICE, MAX_TIME_HOUR, MAX_TIME_MINUTE, MAX_TIME_SECOND, LAST_10_PRICES, LAST_10_SHARES = get_max_values()
 
 # Quantidade de transições passadas observadas
-OBSERVATION_WINDOW = 4
+OBSERVATION_WINDOW = 8
 
 # Initial account variables setup
 ABSOLUTE_INITIAL_ACCOUNT = 0.00
@@ -133,7 +133,7 @@ class ReinforcementLearningEnv(gym.Env):
 
         # Reseta para o início do dataset, caso chegue ao final do dataset (na prática, não deveria continuar, ao chegar ao final)
         if self.deslocamento > len(self.df) - 10:
-            self.deslocamento = 50
+            self.deslocamento = OBSERVATION_WINDOW * 10
 
         next_observation = self._next_observation()
 
