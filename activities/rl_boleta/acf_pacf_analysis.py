@@ -17,10 +17,10 @@ for file in files:
         last_10_treated.append(np.mean(treated_df[i - 10 : i]))
 
     # print(last_10_treated[0:10])
-    # acf_plot = plot_acf(last_10_treated, lags=1000)
-    acf_plot = plot_pacf(last_10_treated, lags=20)
+    acf_plot = plot_acf(last_10_treated, lags=1000)
+    # acf_plot = plot_pacf(last_10_treated, lags=20)
     plt.show()
-    # plt.savefig(f'acf_pacf/acf/{file}.png')
-    plt.savefig(f'acf_pacf/pacf/{file}.png')
+    plt.savefig(f'acf_pacf/acf/{file}.png')
+    # plt.savefig(f'acf_pacf/pacf/{file}.png')
 
 

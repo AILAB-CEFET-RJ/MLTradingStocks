@@ -2,6 +2,7 @@ import math
 import os
 import pandas as pd
 import pdb
+from data_treatment import treat_data
 
 def get_max_values():
     
@@ -16,7 +17,8 @@ def get_max_values():
 
     for filename in os.scandir('csvs'):
 
-        df = pd.read_csv(f'{filename.path}', thousands=',', error_bad_lines=False)
+        print(filename)
+        df = treat_data(f'{filename.path.replace("csvs/", "")}')
 
         description = df.describe()
 
@@ -28,4 +30,14 @@ def get_max_values():
         last_10_prices = last_10_prices if math.ceil(description['Last_10_Prices']['max']) < last_10_prices else math.ceil(description['Last_10_Prices']['max'])
         last_10_shares = last_10_shares if math.ceil(description['Last_10_Shares']['max']) < last_10_shares else math.ceil(description['Last_10_Shares']['max'])
 
+        description = description.applymap('{:.2f}'.format)
+
+        with open('df_statistics.txt', 'a', encoding='utf-8') as f:
+            f.write(f'--------------------------{filename}--------------------------')
+            f.write(description.to_latex())
+            f.write('\n\n\n')
+
+
     return shares, prices, time_hour, time_minute, time_second, last_10_prices, last_10_shares
+
+get_max_values()
