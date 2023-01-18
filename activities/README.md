@@ -37,7 +37,7 @@ Este trabalho leva em consideração as ações das seguintes empresas negociada
 - Delta Airlines
 - Newmont
 
-## Extração de cotações de ativos (pasta get_quotations)
+## Extração de cotações de ativos (pasta get_quotations, arquivo get_quotations_new_selenium.py)
 O arquivo get_quotations_new_selenium.py salva páginas HTML dos ativos listados anteriormente, por meio do acesso ao site CBOE.
 
 O programa começa checando o horário e a data de execução. Caso esteja sendo executado no sábado ou no domingo, o mesmo entra em modo de latência. O mesmo ocorre de segunda a sexta-feira, caso o código seja executado em um horário fora do de operação (ajustado para operar das 09h às 16h, em dias úteis - quando a bolsa norte-americana costuma estar em operação). Quando em modo de latência, o programa realiza checagens de 30 em 30 minutos, com o objetivo de checar se deverá sair ou continuar em modo de latência.
@@ -75,12 +75,18 @@ Cada uma das colunas é previamente tratada, com remoção de vírgulas de valor
 
 ## Aplicação de agente de Apredizado por Reforço (pasta rl_boleta)
 A seção de Aprendizado por Reforço foi segmentada de acordo com as seguintes funcionalidades:
-- Função Principal
-- Modelo de Reinforcement Learning
-- Treinamento de Dados
-- Teste de Dados
-- Tratamento de Dados (CSV)
-- Plotagem de gráficos
+- Função Principal (arquivo main.py)
+- Modelo de Reinforcement Learning (arquivo rl_model.py)
+- Treinamento de Dados (arquivo training.py)
+- Teste de Dados (arquivo testing.py)
+- Tratamento de Dados (CSV) (arquivo data_treatment.py)
+- Plotagem de gráficos (arquivo plot.py)
+- Análises de ACF (autocorrelação) e PACF (autocorrelação parcial) para os conjuntos de dados (arquivo acf_pacf.py)
+- Teste de dados sem treinamento prévio (arquivo brute_testing.py)
+- Implementação do teste de Mann-Kendall sobre os conjuntos de dados (arquivo kendall.py)
+- Geração de tabelas em Latex com resumos estatísticos (arquivo results_statistics.py)
+- Geração de tabelas com resumos estatísticos para os resultados - conjuntos com 50 treinamentos e 50 testes (arquivo results_statistics.py)
+- (INACABADO) Simulador de cotações, para facilitar o treinamento do modelo de Aprendizado por Reforço (arquivo stock_simulator.py)
 
 A função principal (*main.py*) é o ponto centralizador, em que são definidos os arquivos csv utilizados para treinamento e teste dos dados salvos nos arquivos CSV. Além disso, neste arquivo são definidas a quantidade de vezes em que treinamentos e testes serão executados, com o objetivo de avaliar a eficácia média e outras observações estatísticas para o modelo utilizado.
 
@@ -107,13 +113,159 @@ Os retornos, tanto do treinamento quanto dos testes, são aglutinados e salvos e
 
 Por fim, o modelo de Aprendizagem por Reforço considera, além da inicialização da classe, as funções de reset, próxima observação, passo, tomada de ação e renderização.
 
-## Como executar treinamento/teste do modelo
+
+## Como executar treinamento/teste do modelo em um servidor do CEFET
 1. Acessar o servidor Aquarii ou Arietis
+
 1.1 No Aquarii, acessar ~/data_extraction/data_extraction/activities/rl_boleta
+
 2. Verificar os screens existentes ('screen -ls' - SEM AS ASPAS)
+
 2.1 Caso exista um screen com o nome x, acessá-lo, por meio do comando 'screen -r x' (SEM AS ASPAS)
+
 2.2 Caso não exista, criar um novo screen com o nome de x e acessá-lo, por meio do comando 'screen -r x' (SEM AS ASPAS)
+
 3. Digitar o comando 'conda activate ai_env' (SEM AS ASPAS), para ativar o ambiente que contém as instalações feitas para rodar treinamentos/testes
+
 4. Acessar a pasta rl_boleta
+
 5. Rodar o comando 'python3 main.py' (SEM AS ASPAS), para realizar o treinamento/teste
 5.1 Caso haja a necessidade de alterar os arquivos de treinamento e/ou teste, alterar o arquivo main.py
+
+
+## Como instalar o projeto em máquinas com Sistema Operacional Linux (distro Ubuntu)
+1. Na pasta que o usuário desejar, clonar o projeto, a partir do seguinte comando:
+
+1.1 Via SSH:
+> git init
+> git clone git@github.com:MLRG-CEFET-RJ/MLTradingStocks.git
+
+1.2 Via HTTPS:
+> git init
+> git clone https://github.com/MLRG-CEFET-RJ/MLTradingStocks.git
+
+2. Instalar conjunto de pacotes, incluindo o gerenciador de pacotes Conda:
+2.1 Instalar o Anaconda ou o Miniconda (versão mais leve) no Linux (seguir os passos no link a seguir):
+> https://docs.anaconda.com/anaconda/install/
+
+2.2 Diferença entre Anaconda, Miniconda e Conda:
+> https://stackoverflow.com/questions/30034840/what-are-the-differences-between-conda-and-anaconda
+
+3. Instalar os pacotes necessários para rodar o algoritmo de Aprendizagem por Reforço:
+3.1 conda install -c conda-forge/label/cf202003 tensorflow
+3.2 conda install -c conda-forge stable-baselines3
+3.3 conda install -c conda-forge gym
+3.4 conda install -c pytorch pytorch
+
+4. Utilizar um ambiente virtual conda, para rodar os algoritmos:
+4.1 Criar o ambiente virtual
+> https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands
+
+4.2 Ativar o ambiente criado
+> https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment
+
+4.3 Após utilização do ambiente (seja para instalação de dependências, seja para execução de rotinas), desativar o ambiente criado (a desativação não exclui o ambiente, apenas sai dele):
+> https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#deactivating-an-environment
+
+Quando o usuário desejar, poderá novamente acessar o ambiente criado, com o comando 'conda activate myenv' (checar a seção 4.2).
+
+
+5. Com o ambiente Conda criado e ativado, instalar os pacotes necessários para rodar o algoritmo de extração de dados (este passo só é necessário 1 vez, quando o ambiente for acessado pela primeira vez):
+5.1 conda install -c conda-forge/label/cf202003 geckodriver
+5.2 conda install -c anaconda beautifulsoup4
+5.3 conda install -c conda-forge/label/cf202003 firefox
+5.4 conda install -c anaconda pandas
+5.5 conda install -c anaconda numpy
+5.6 conda install -c conda-forge/label/cf202003 selenium
+
+
+## Como instalar o projeto em máquinas com Sistema Operacional Windows
+1. Instalar o ambiente terminal Ubuntu no Windows, seguindo as intruções do link a seguir:
+> https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-10#1-overview
+
+2. A partir do terminal Ubuntu, escolher/criar a pasta desejada e clonar o repositório:
+2.1 Via HTTPS: 
+> git init
+> git clone https://github.com/MLRG-CEFET-RJ/MLTradingStocks.git
+
+2.2 Via SSH:
+> git init
+> git clone git@github.com:MLRG-CEFET-RJ/MLTradingStocks.git
+
+3. Seguir os passos 2 a 4, para instalar pacotes e gerenciador de pacotes, além de instalar as dependências para o projeto.
+
+
+## Como rodar o algoritmo de coleta de dados?
+1. Ativar o ambiente Conda criado, caso não esteja ativado
+
+2. Acessar a pasta *get_quotations*, arquivo *get_quotations_new_selenium.py*
+
+3. Executar a rotina em Python, com o comando:
+3.1 Comando padrão
+> python3 get_quotations_new_selenium.py
+
+3.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 get_quotations_new_selenium.py > *nome*.txt
+
+
+## Como rodar o algoritmo de treinamento e teste dos dados?
+1. Ativar o ambiente Conda criado, caso não esteja ativado
+
+2. Acessar a pasta *rl_boleta*, arquivo *main.py*
+
+3. Executar a rotina em Python, com o comando:
+3.1 Comando padrão
+> python3 main.py
+
+3.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 main.py > *nome*.txt
+
+
+## Como rodar o algoritmo de obtenção de dados estatísticos?
+1. Ativar o ambiente Conda criado, caso não esteja ativado
+
+2. Acessar a pasta *rl_boleta*
+2.1 Para executar a rotina em Python do arquivo de autocorrelação e autocorrelação parcial, digitar o comando:
+
+2.1.1 Comando padrão
+> python3 acf_pacf.py
+
+2.1.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 acf_pacf.py > *nome*.txt
+
+2.2 Para executar a rotina em Python do arquivo de aplicação do teste de Mann-Kendall, digitar o comando:
+
+2.2.1 Comando padrão
+> python3 kendall.py
+
+2.2.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 kendall.py > *nome*.txt
+
+2.3 Para executar a rotina em Python do arquivo de estatísticas dos conjuntos de dados, digitar o comando:
+
+2.3.1 Comando padrão
+> python3 get_df_statistics.py
+
+2.3.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 get_df_statistics.py > *nome*.txt
+
+2.4 Para executar a rotina em Python do arquivo de estatísticas sobre os resultados obtidos (para o conjunto de treinamentos e testes), digitar o comando:
+
+2.4.1 Comando padrão
+> python3 results_statistics.py
+
+2.4.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 results_statistics.py > *nome*.txt
+
+2.5 Para executar a rotina em Python do arquivo de simulação de preço de ações, digitar o comando:
+
+2.5.1 Comando padrão
+> python3 stock_simulator.py
+
+2.5.2 Comando, caso o usuário deseje que a rotina seja executada em modo silencioso e com o log em arquivo .txt:
+> nohup python3 stock_simulator.py > *nome*.txt
+
+
+
+## Observação
+O projeto completo NÃO foi desenvolvido em nenhum Notebook Jupyter.

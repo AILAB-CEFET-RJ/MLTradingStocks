@@ -1,5 +1,3 @@
-import urllib
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,10 +11,8 @@ from datetime import date
 import time
 import calendar
 from time import sleep
-import codecs
 import os
 from os import path
-import glob
 import gc
 from pytz import timezone
 
@@ -93,7 +89,6 @@ def scrapper(URLs):
     print("executou uma parte")
     return
 
-
 def getHTML(URL):
     try:
         driver = Load()
@@ -106,15 +101,7 @@ def getHTML(URL):
         EC.text_to_be_present_in_element((By.ID, "bkCompany0"), URL_dictionary[URL])
     )
 
-    # elemento = driver.find_element_by_id("bkTimestamp0")
-    # print(elemento)
-
-    # text = driver.find_element_by_id("ext-gen1057").text
-    # print(text)
-
     content = BeautifulSoup(driver.page_source, "html.parser")
-    # print('Pegou a página')
-
 
     last_updated_time = content.find('span', id="bkTimestamp0")
     print(f'URL: {URL}\nLast Updated Time: {last_updated_time.contents}')
@@ -151,6 +138,7 @@ def getHTML(URL):
         f.write(str(content))    
         f.close()
     else:
+        # trocar por f string
         os.mkdir(today_date + '_html')
     
     return
@@ -158,19 +146,12 @@ def getHTML(URL):
 
 
 def main():
-    print('Início da execução do programa')
-
-
-    # Sempre executa
     while True:
         current_date = date.today()
         day_of_the_week = calendar.day_name[current_date.weekday()]
         # print(day_of_the_week.lower())
         done = (datetime.now(tz).strftime('%H:%M:%S') > upper_limit or datetime.now(tz).strftime('%H:%M:%S') < lower_limit or
                 day_of_the_week.lower() == 'saturday' or day_of_the_week.lower() == 'sunday')
-
-        
-
 
         while done:
             print('Done')
@@ -193,8 +174,6 @@ def main():
             if done:
                 pass
             else:
-            
-                # Realiza as coletas e salva os HTML, de 5 em 5 minutos
                 if minute % 2 == 0:
                     print(f"loop de coleta iniciado, em {datetime.now(tz).strftime('%H:%M:%S')}, Eastern Time.")
                     scrapper(URLs)
@@ -207,8 +186,6 @@ def main():
                     sleep(10)
                 else:
                     sleep(10)
-
-
 
 
 if (__name__ == '__main__'):
