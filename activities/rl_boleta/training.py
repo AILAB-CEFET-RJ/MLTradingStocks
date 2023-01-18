@@ -1,12 +1,10 @@
-from random import seed
 from data_treatment import treat_data
 from stable_baselines3.sac.policies import MlpPolicy
 from stable_baselines3.common.vec_env import DummyVecEnv
-from stable_baselines3 import PPO
-from rl_model_menor import ReinforcementLearningEnv
+from stable_baselines3 import PPO, A2C, DDPG, TD3
+from sb3_contrib import TQC, TRPO
+from rl_model import ReinforcementLearningEnv
 from plot import plot_lucro_bruto, plot_qtde_acumulada_cotas_compradas_vendidas, plot_qtde_acumulada_decisoes_agente, plot_reward, plot_lucro_liquido, plot_qtde_acoes_posse
-import numpy as np
-import pdb
 
 DIAS_TESTE = 7
 
@@ -55,7 +53,8 @@ def train_agent(training_files, repetitive_iteration_number):
 
         # env_training.reset()
         if index == 0:
-            model = PPO("MlpPolicy", env_training, verbose=1)
+            # model = PPO("MlpPolicy", env_training, verbose=1)
+            model = TRPO("MlpPolicy", env_training, verbose=1)
 
         else:
             model.set_env(env_training)

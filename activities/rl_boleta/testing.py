@@ -1,8 +1,8 @@
 from data_treatment import treat_testing_data
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3 import PPO
-import rl_model_menor
-from rl_model_menor import ReinforcementLearningEnv
+import rl_boleta.rl_model as rl_model
+from rl_model import ReinforcementLearningEnv
 from plot import plot_lucro_bruto, plot_qtde_acumulada_cotas_compradas_vendidas, plot_qtde_acumulada_decisoes_agente, plot_reward, plot_lucro_liquido, plot_qtde_acoes_posse
 import csv
 import pdb

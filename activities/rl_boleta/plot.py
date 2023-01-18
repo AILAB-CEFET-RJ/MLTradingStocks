@@ -1,4 +1,4 @@
-import rl_model_menor
+import rl_model as rl_model
 import numpy as np
 import matplotlib as mp
 import matplotlib.pyplot as plt
